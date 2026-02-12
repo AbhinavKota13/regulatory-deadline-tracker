@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card shadow">
+    <div class="card-header bg-white">
+        <h4 class="mb-0">Regulatory Submissions Dashboard</h4>
+    </div>
+
+    <div class="card-body">
+
+        {% if submissions %}
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Product Name</th>
+                    <th>Country</th>
+                    <th>Submission Type</th>
+                    <th>Deadline</th>
+                    <th>Countdown</th>
+                    <th>Status</th>
+                    <th style="width:150px;">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for s in submissions %}
+                <tr class="
+                        {% if s.badge == 'danger' %}
+                            table-danger
+                        {% elif s.badge == 'warning' %}
+                             table-warning
+                        {% endif %}
+                ">
+                    <td>{{ s.product_name }}</td>
+                    <td>{{ s.country }}</td>
+                    <td>{{ s.submission_type }}</td>
+                    <td>{{ s.deadline_date }}</td>
+                    <td>
+                        <span class="badge bg-{{ s.badge }}">
+                            {{ s.countdown }}
+                        </span>
+                    </td>
+                    <td>
+
+                        <span class="badge bg-{{ s.badge }}">
+                            {{ s.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <a class="btn btn-sm btn-warning"
+                           href="/edit/{{ s.id }}">Edit</a>
+
+                        <a class="btn btn-sm btn-danger"
+                           href="/delete/{{ s.id }}"
+                           onclick="return confirm('Delete this submission?');">
+                           Delete
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+        {% else %}
+            <p class="text-muted">No submissions added yet.</p>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}
