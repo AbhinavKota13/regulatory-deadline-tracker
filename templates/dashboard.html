@@ -2,6 +2,26 @@
 
 {% block content %}
 
+<!-- =========================
+     CHART CARD
+========================= -->
+
+<div class="card shadow mb-4">
+    <div class="card-header bg-white">
+        <h4 class="mb-0">Submission Analytics</h4>
+    </div>
+
+    <div class="card-body">
+        <canvas id="submissionChart" height="100"></canvas>
+    </div>
+</div>
+
+
+
+<!-- =========================
+     TABLE CARD
+========================= -->
+
 <div class="card shadow">
     <div class="card-header bg-white">
         <h4 class="mb-0">Regulatory Submissions Dashboard</h4>
@@ -26,27 +46,29 @@
             <tbody>
                 {% for s in submissions %}
                 <tr class="
-                        {% if s.badge == 'danger' %}
-                            table-danger
-                        {% elif s.badge == 'warning' %}
-                             table-warning
-                        {% endif %}
+                    {% if s.badge == 'danger' %}
+                        table-danger
+                    {% elif s.badge == 'warning' %}
+                        table-warning
+                    {% endif %}
                 ">
                     <td>{{ s.product_name }}</td>
                     <td>{{ s.country }}</td>
                     <td>{{ s.submission_type }}</td>
                     <td>{{ s.deadline_date }}</td>
+
                     <td>
                         <span class="badge bg-{{ s.badge }}">
                             {{ s.countdown }}
                         </span>
                     </td>
-                    <td>
 
+                    <td>
                         <span class="badge bg-{{ s.badge }}">
                             {{ s.status }}
                         </span>
                     </td>
+
                     <td>
                         <a class="btn btn-sm btn-warning"
                            href="/edit/{{ s.id }}">Edit</a>
@@ -68,5 +90,51 @@
 
     </div>
 </div>
+
+
+
+<!-- =========================
+     CHART.JS CDN
+========================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const ctx = document.getElementById('submissionChart');
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['Total', 'Upcoming', 'Due Soon', 'Overdue'],
+        datasets: [{
+            label: 'Submission Count',
+            data: [{{ total }}, {{ upcoming }}, {{ due_soon }}, {{ overdue }}],
+            backgroundColor: [
+                '#0d6efd',  // blue
+                '#198754',  // green
+                '#ffc107',  // orange
+                '#dc3545'   // red
+            ],
+            borderRadius: 6
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1
+                }
+            }
+        }
+    }
+});
+</script>
 
 {% endblock %}

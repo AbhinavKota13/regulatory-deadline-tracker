@@ -29,34 +29,28 @@ def init_db():
 
 
 # ---------------------------
-# Status Logic
+# Status Logic (Enterprise Countdown)
 # ---------------------------
 def calculate_status(deadline_str):
     deadline = datetime.strptime(deadline_str, "%Y-%m-%d").date()
     today = date.today()
     diff = (deadline - today).days
 
-    # Enterprise-style countdown message
     if diff < 0:
         countdown = f"Overdue by {abs(diff)} day{'s' if abs(diff) != 1 else ''}"
         return countdown, "Overdue", "danger"
 
     elif diff == 0:
-        countdown = "Due Today"
-        return countdown, "Due Soon", "warning"
+        return "Due Today", "Due Soon", "warning"
 
     elif diff == 1:
-        countdown = "Due Tomorrow"
-        return countdown, "Due Soon", "warning"
+        return "Due Tomorrow", "Due Soon", "warning"
 
     elif diff <= 14:
-        countdown = f"Due in {diff} days"
-        return countdown, "Due Soon", "warning"
+        return f"Due in {diff} days", "Due Soon", "warning"
 
     else:
-        countdown = f"Due in {diff} days"
-        return countdown, "Upcoming", "success"
-
+        return f"Due in {diff} days", "Upcoming", "success"
 
 
 # ---------------------------
@@ -73,9 +67,22 @@ def dashboard():
 
     submissions = []
 
+    # Analytics counters
+    total = len(rows)
+    upcoming = 0
+    due_soon = 0
+    overdue = 0
+
     for row in rows:
         countdown, status, badge = calculate_status(row[4])
-        
+
+        if status == "Upcoming":
+            upcoming += 1
+        elif status == "Due Soon":
+            due_soon += 1
+        elif status == "Overdue":
+            overdue += 1
+
         submissions.append({
             "id": row[0],
             "product_name": row[1],
@@ -85,10 +92,16 @@ def dashboard():
             "countdown": countdown,
             "status": status,
             "badge": badge
-
         })
 
-    return render_template("dashboard.html", submissions=submissions)
+    return render_template(
+        "dashboard.html",
+        submissions=submissions,
+        total=total,
+        upcoming=upcoming,
+        due_soon=due_soon,
+        overdue=overdue
+    )
 
 
 # ---------------------------
